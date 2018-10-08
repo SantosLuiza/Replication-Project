@@ -1,0 +1,24 @@
+---
+title: "Replication of Why Do We Hate Hypocrites? Evidence for a Theory of False Signaling by Jillian Jordan, Roseanna Sommers, Paul Bloom & David Rand (2016, Psychological Science)"
+author: "Luiza A. Santos (lsantos1@stanford.edu)"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+---
+
+<!-- Replication reports should all use this template to standardize reporting across projects.  These reports will be public supplementary materials that accompany the summary report(s) of the aggregate results. -->
+
+##Introduction
+
+As a graduate student in Psychology, I am interested in exploring the processes underlying moral cognition. One particular area of interest is to examine how people perceive different types of moral transgressions. Related to this topic, Jordan and colleagues (2016) sought to explain why hypocrites (i.e., those who condemn transgressions they engage in) are more disliked than individuals who commit the same transgressions without condemning them. The authors hypothesized that hypocrites are disliked because their condemnation falsely signals their own moral goodness. Although all five studies reported in this paper support this prediction in different ways, Study 4 is the only one that explicitly focuses on the false-signaling element and is, therefore, critical to the article’s key claim. Thus Study 4’s results will be the target of this replication. 
+
+In Study 4, participants were presented with vignettes in which a target character discusses an acquaintance’s moral transgression and then privately goes on to engage in the same transgression. In a three-condition, between-subjects design, the authors manipulated whether, before engaging in the relevant moral transgression, the target (a) condemned the violation (traditional-hypocrite condition), (b) condemned the violation but explicitly negated any signaling value of the condemnation (honest-hypocrite condition), or (c) said nothing (control-transgressor condition). All the experimental materials for this study are available online and can be accessed here: https://osf.io/2r8ab/.
+
+As the authors made all data and materials publicly available via the Open Science Framework, potential replication difficulties have been significantly decreased. However, due to financial constraints, it may not be feasible to reproduce the paper’s original sample size of 452 subjects, which will negatively impact the statistical power of our replication.
+
+Link to repository: https://github.com/SantosLuiza/Replication-Project
+Link to original paper: https://github.com/SantosLuiza/Replication-Project/blob/master/original_paper/jordan2016.pdf
