@@ -14,16 +14,14 @@ output:
 
 ##Introduction
 
-As a graduate student in Psychology, I am interested in exploring the processes underlying moral cognition. One particular area of interest is to examine how people perceive different types of moral transgressions. Related to this topic, Jordan and colleagues (2017) sought to explain why hypocrites (i.e., those who condemn transgressions they engage in) are more disliked than individuals who commit the same transgressions without condemning them. The authors hypothesized that hypocrites are disliked because their condemnation falsely signals their own moral goodness. Although all five studies reported in this paper support this prediction in different ways, Study 4 is the only one that explicitly focuses on the false-signaling element and is, therefore, critical to the article's key claim. Thus Study 4's results will be the target of this replication. 
+As a graduate student in Psychology, I am interested in exploring the processes underlying moral cognition. One particular area of interest is to examine how people perceive different types of moral transgressions. Related to this topic, Jordan and colleagues (2017) sought to explain why hypocrites (i.e., those who condemn transgressions they engage in) are more disliked than individuals who commit the same transgressions without condemning them. The authors hypothesized that hypocrites are disliked because their condemnation falsely signals their own moral goodness. Although all five studies reported in this paper support this prediction in different ways, Study 4 is the only one that explicitly focuses on the false-signaling element and is, therefore, critical to the article's key claim. Thus, Study 4's results will be the target of this replication. 
 
 As the authors made all data and materials publicly available via the Open Science Framework, potential replication difficulties have been significantly decreased.
 
 Link to repository: https://github.com/SantosLuiza/Replication-Project
 Link to original paper: https://github.com/SantosLuiza/Replication-Project/blob/master/original_paper/jordan2016.pdf
 
-
 ##Methods
-
 
 ###Planned Sample
 
@@ -77,9 +75,11 @@ Following the original article criteria, we will exclude from the analysis parti
 
 ### Data preparation
 
-Data preparation 
-
+Data preparation following the analysis plan.
+	
 ```{r}
+###Data Preparation
+
 ###Import data and Load Relevant Libraries and Functions
 library(tidyverse)
 library(ggplot2)
@@ -88,13 +88,16 @@ library(ggplot2)
 ###Prepare data for analysis
 
 
-###Analyzing differences in means
-
-
 #### Data exclusion / filtering
+
 #Delete subjects who have identical IP adresses or who have not completed the survey
 
-#### Plot data
+####Analyzing differences in means
+
+
+####Plotting data
+
+
 
 ```
 
@@ -105,3 +108,4 @@ The analyses as specified in the analysis plan.
 ###One way ANOVA
 
 ``` 
+
