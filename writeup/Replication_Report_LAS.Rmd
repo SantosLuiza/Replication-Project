@@ -14,9 +14,9 @@ output:
 
 ##Introduction
 
-As a graduate student in Psychology, I am interested in exploring the processes underlying moral cognition. One particular area of interest is to examine how people perceive different types of moral transgressions. Related to this topic, Jordan and colleagues (2016) sought to explain why hypocrites (i.e., those who condemn transgressions they engage in) are more disliked than individuals who commit the same transgressions without condemning them. The authors hypothesized that hypocrites are disliked because their condemnation falsely signals their own moral goodness. Although all five studies reported in this paper support this prediction in different ways, Study 4 is the only one that explicitly focuses on the false-signaling element and is, therefore, critical to the article’s key claim. Thus Study 4’s results will be the target of this replication. 
+As a graduate student in Psychology, I am interested in exploring the processes underlying moral cognition. One particular area of interest is to examine how people perceive different types of moral transgressions. Related to this topic, Jordan and colleagues (2017) sought to explain why hypocrites (i.e., those who condemn transgressions they engage in) are more disliked than individuals who commit the same transgressions without condemning them. The authors hypothesized that hypocrites are disliked because their condemnation falsely signals their own moral goodness. Although all five studies reported in this paper support this prediction in different ways, Study 4 is the only one that explicitly focuses on the false-signaling element and is, therefore, critical to the article's key claim. Thus Study 4's results will be the target of this replication. 
 
-As the authors made all data and materials publicly available via the Open Science Framework, potential replication difficulties have been significantly decreased. However, due to financial constraints, it may not be feasible to reproduce the paper’s original sample size of 457 subjects, which will negatively impact the statistical power of our replication.
+As the authors made all data and materials publicly available via the Open Science Framework, potential replication difficulties have been significantly decreased.
 
 Link to repository: https://github.com/SantosLuiza/Replication-Project
 Link to original paper: https://github.com/SantosLuiza/Replication-Project/blob/master/original_paper/jordan2016.pdf
@@ -27,15 +27,17 @@ Link to original paper: https://github.com/SantosLuiza/Replication-Project/blob/
 
 ###Planned Sample
 
-In the original paper, Jordan and colleagues recruited 457 subjects online using Amazon Mturk. For this replication project, we will agree upon a viable sample size after conducting a power analysis. We will analyze responses from all subjects who have unique IP addresses and have evaluated all the vignettes.
+In the original paper, Jordan and colleagues recruited 457 subjects online using Amazon Mturk. For this replication project, we will run the study's original sample size (approximately 150 participants per condition) with two conditions, for a total of 300 participants. As the control condition isn't crucial for the study's central claim, we will drop it from this replication.
+
+We will analyze responses from all subjects who have unique IP addresses and have evaluated all the vignettes.
 
 ###Materials
 
 We will use the same materials employed by original authors. All the experimental materials for this study are available online and can be accessed here: https://osf.io/2r8ab/.
 
-Each participant will be presented with four vignettes (in random order), about downloading music illegally, evading jury duty, ignoring phone calls from one’s mother, and wasting paper by printing documents single-sided. 
+Each participant will be presented with four vignettes (in random order), about downloading music illegally, evading jury duty, ignoring phone calls from one�'s mother, and wasting paper by printing documents single-sided. 
 
-In each vignette, a target character discusses an acquaintance’s moral transgression and then privately goes on to engage in the same transgression. In a three-condition, between-subjects design, we will manipulate whether, before engaging in the relevant moral transgression, the target (a) condemned the violation (traditional-hypocrite condition), (b) condemned the violation but explicitly negated any signaling value of the condemnation (honest-hypocrite condition), or (c) said nothing (control-transgressor condition). 
+In each vignette, a target character discusses an acquaintance's moral transgression and then privately goes on to engage in the same transgression. In a two-condition, between-subjects design, we will manipulate whether, before engaging in the relevant moral transgression, the target (a) condemned the violation (traditional-hypocrite condition), or (b) condemned the violation but explicitly negated any signaling value of the condemnation (honest-hypocrite condition).
 
 After reading the vignettes, participants will be asked to evaluate the target.
 
@@ -45,7 +47,7 @@ We will follow the original paper's procedure precisely. Below is a detailed des
 
 "Each vignette described a conversation between two characters: a target (whom subjects would later evaluate) and a friend (whom subjects would not evaluate). In all conditions, this conversation began with the target and the friend discussing a mutual acquaintance. In this discussion, the friend mentioned that the mutual acquaintance often engaged in a particular moral transgression."
 
-"In the traditional-hypocrite condition, the target responded to the friend by condemning the transgression. In the honest-hypocrite condition, the target responded to the friend by stating that he or she believed the behavior in question to be morally wrong but sometimes behaved that way anyway. Finally, in the control-transgressor condition, we did not include any information about a response from the target. Shortly after this conversation ended, in all conditions, the target went on to commit the relevant violation.
+"In the traditional-hypocrite condition, the target responded to the friend by condemning the transgression. In the honest-hypocrite condition, the target responded to the friend by stating that he or she believed the behavior in question to be morally wrong but sometimes behaved that way anyway. (...) Shortly after this conversation ended, in all conditions, the target went on to commit the relevant violation.
 
 For example, here is the full text for a scenario about downloading music illegally. In this scenario, Becky is the target character, and Amanda is the friend. In all conditions, the vignette began as follows:
 
@@ -59,11 +61,9 @@ In the honest-hypocrite condition, the passage instead continued with
 
     Becky says that she thinks it is morally wrong to download music illegally from the Internet, but that she sometimes does it anyway. Shortly after their conversation, Becky goes online, and downloads music illegally.
 
-Finally, in the control-transgressor condition, nothing was said about Becky’s opinion or behavior, and the passage simply ended with
-
-    Shortly after their conversation, Becky goes online, and downloads music illegally.
-
 After reading each vignette, subjects evaluated the target. We asked subjects to rate how good a person the target was, how much they liked the target, how honest they thought the target was, and how trustworthy they thought the target was. These five dependent measures were presented in random order for each vignette. They responded to each item on a sliding scale, with anchors reading not at all [trait] to very [trait] (e.g., not at all trustworthy to very trustworthy). The sliding scales did not have any numerical labels, but responses were translated to scores ranging from 0 (not at all) to 100 (very)."
+
+Link to paradigm: https://stanforduniversity.qualtrics.com/jfe/form/SV_5nJWFtwbmrNq3jL
 
 ###Analysis Plan
 
@@ -77,24 +77,24 @@ Following the original article criteria, we will exclude from the analysis parti
 
 ### Data preparation
 
-Data preparation following the analysis plan.
-	
+Data preparation 
+
 ```{r}
-###Data Preparation
+###Import data and Load Relevant Libraries and Functions
+library(tidyverse)
+library(ggplot2)
 
-####Load Relevant Libraries and Functions
 
-#dplyr
+###Prepare data for analysis
 
-####Import data
+
+###Analyzing differences in means
+
 
 #### Data exclusion / filtering
-
 #Delete subjects who have identical IP adresses or who have not completed the survey
 
-#### Prepare data for analysis - create columns etc.
-
-#Tidy data
+#### Plot data
 
 ```
 
@@ -102,5 +102,6 @@ Data preparation following the analysis plan.
 
 The analyses as specified in the analysis plan. 
 ``` {r}
-#anova
-```
+###One way ANOVA
+
+``` 
