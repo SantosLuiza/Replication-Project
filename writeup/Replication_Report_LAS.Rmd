@@ -1,5 +1,5 @@
 ---
-title: "Replication of Why Do We Hate Hypocrites? Evidence for a Theory of False Signaling by Jillian Jordan, Roseanna Sommers, Paul Bloom & David Rand (2016, Psychological Science)"
+title: "Replication of Why Do We Hate Hypocrites? Evidence for a Theory of False Signaling by Jillian Jordan, Roseanna Sommers, Paul Bloom & David Rand (2017, Psychological Science)"
 author: "Luiza A. Santos (lsantos1@stanford.edu)"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -65,9 +65,9 @@ Link to paradigm: https://stanforduniversity.qualtrics.com/jfe/form/SV_5nJWFtwbm
 
 ###Analysis Plan
 
-To test the authors' prediction, we will conduct a one-way ANOVA investigating the effect of condition on positive evaluations of the targets across the vignettes.
+To test the authors' prediction, we will conduct a pairwise comparison investigating the effect of condition on positive evaluations of the targets across the vignettes.
 
-In order to confirm that the honest hypocrite manipulation fully eliminates disapproval of hypocrisy, pairwise comparisons should reveal that traditional hypocrites are evaluated more negatively than both honest hypocrites and control trangressors and that evaluations of honest hypocrites and control transgressors do not differ. 
+In order to confirm that the honest hypocrite manipulation fully eliminates disapproval of hypocrisy, pairwise comparisons should reveal that traditional hypocrites are evaluated more negatively than honest hypocrites. 
 
 Following the original article criteria, we will exclude from the analysis participants who have identical IP addresses and those who do not complete the survey. 
 
@@ -76,27 +76,50 @@ Following the original article criteria, we will exclude from the analysis parti
 ### Data preparation
 
 Data preparation following the analysis plan.
-	
-```{r}
-###Data Preparation
 
+```{r}
 ###Import data and Load Relevant Libraries and Functions
 library(tidyverse)
 library(ggplot2)
-
-
-###Prepare data for analysis
-
+B_data <- read_csv("PilotB_data.csv")
+head(B_data)
 
 #### Data exclusion / filtering
-
 #Delete subjects who have identical IP adresses or who have not completed the survey
 
-####Analyzing differences in means
+###Preparing data for analysis
+B_data <- B_data %>% 
+  gather(Condition, Eval, starts_with("Traditional"), starts_with("Honest")) %>%
+  separate(Condition, into = c("Condition", "Variable", "Scenario"), sep = "_")
 
+###Reverse scoring "hypocrite" variable
 
-####Plotting data
+B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
+B_data$Eval <- NULL
+
+###Analyzing differences in means
+    
+B_data1 <- B_data %>% 
+  select(`Random ID`, Condition, Variable, Evaluation)
+
+Sub_means <- B_data1 %>%
+  group_by(`Random ID`, Condition) %>%
+  summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
+
+Grand_means <- Sub_means %>%
+  group_by(Condition) %>%
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
+
+#ciMult <- qt(0.95/2 + .5, 1)
+sd=sd(Grand_means$grand_mean_evaluation)
+se=sd/sqrt(1)
+#ci= se*ciMult
+
+plot <- ggplot(Grand_means, aes(x = Condition, y = grand_mean_evaluation)) + 
+   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-sd, ymax=grand_mean_evaluation+sd), width = .2) + theme_minimal()
+
+plot
 
 
 ```
@@ -105,7 +128,8 @@ library(ggplot2)
 
 The analyses as specified in the analysis plan. 
 ``` {r}
-###One way ANOVA
+###Pairwise comparison
+Eval_test <- t.test(Evaluation ~ Condition, data = B_data1)   
+Eval_test
 
 ``` 
-
