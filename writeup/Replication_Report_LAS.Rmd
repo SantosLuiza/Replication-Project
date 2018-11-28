@@ -96,14 +96,12 @@ B_data <- B_data %>%
 
 B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
-B_data$Eval <- NULL
-
 ###Analyzing differences in means
     
-B_data1 <- B_data %>% 
+B_data_small <- B_data %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
-Sub_means <- B_data1 %>%
+Sub_means <- B_data_small %>%
   group_by(`Random ID`, Condition) %>%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
@@ -129,7 +127,7 @@ plot
 The analyses as specified in the analysis plan. 
 ``` {r}
 ###Pairwise comparison
-Eval_test <- t.test(Evaluation ~ Condition, data = B_data1)   
+Eval_test <- t.test(sub_mean ~ Condition, data = Sub_means)   
 Eval_test
 
 ``` 

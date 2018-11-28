@@ -11,7 +11,7 @@
 
 <meta name="author" content="Luiza A. Santos (lsantos1@stanford.edu)" />
 
-<meta name="date" content="2018-11-27" />
+<meta name="date" content="2018-11-28" />
 
 <title>Replication of Why Do We Hate Hypocrites? Evidence for a Theory of False Signaling by Jillian Jordan, Roseanna Sommers, Paul Bloom &amp; David Rand (2017, Psychological Science)</title>
 
@@ -228,7 +228,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Replication of Why Do We Hate Hypocrites? Evidence for a Theory of False Signaling by Jillian Jordan, Roseanna Sommers, Paul Bloom &amp; David Rand (2017, Psychological Science)</h1>
 <h4 class="author"><em>Luiza A. Santos (<a href="mailto:lsantos1@stanford.edu">lsantos1@stanford.edu</a>)</em></h4>
-<h4 class="date"><em>November 27, 2018</em></h4>
+<h4 class="date"><em>November 28, 2018</em></h4>
 
 </div>
 
@@ -349,14 +349,12 @@ B_data &lt;- B_data %&gt;%
 
 B_data &lt;- mutate(B_data, Evaluation = ifelse(B_data$Variable == &quot;hypo&quot;, 100 - B_data$Eval, B_data$Eval))
 
-B_data$Eval &lt;- NULL
-
 ###Analyzing differences in means
     
-B_data1 &lt;- B_data %&gt;% 
+B_data_small &lt;- B_data %&gt;% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
-Sub_means &lt;- B_data1 %&gt;%
+Sub_means &lt;- B_data_small %&gt;%
   group_by(`Random ID`, Condition) %&gt;%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
@@ -379,16 +377,16 @@ plot</code></pre>
 <h3>Confirmatory analysis</h3>
 <p>The analyses as specified in the analysis plan.</p>
 <pre class="r"><code>###Pairwise comparison
-Eval_test &lt;- t.test(Evaluation ~ Condition, data = B_data1)   
+Eval_test &lt;- t.test(sub_mean ~ Condition, data = Sub_means)   
 Eval_test</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
-## data:  Evaluation by Condition
-## t = -3.1462, df = 111.48, p-value = 0.002121
+## data:  sub_mean by Condition
+## t = -1.5135, df = 4.5941, p-value = 0.1956
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  -23.719005  -5.387662
+##  -39.94308  10.83642
 ## sample estimates:
 ##      mean in group Honest mean in group Traditional 
 ##                  53.33000                  67.88333</code></pre>
