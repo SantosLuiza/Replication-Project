@@ -33,7 +33,7 @@ We will analyze responses from all subjects who have unique IP addresses and hav
 
 We will use the same materials employed by original authors. All the experimental materials for this study are available online and can be accessed here: https://osf.io/2r8ab/.
 
-Each participant will be presented with four vignettes (in random order), about downloading music illegally, evading jury duty, ignoring phone calls from oneâ's mother, and wasting paper by printing documents single-sided. 
+Each participant will be presented with four vignettes (in random order), about downloading music illegally, evading jury duty, ignoring phone calls from one's mother, and wasting paper by printing documents single-sided. 
 
 In each vignette, a target character discusses an acquaintance's moral transgression and then privately goes on to engage in the same transgression. In a two-condition, between-subjects design, we will manipulate whether, before engaging in the relevant moral transgression, the target (a) condemned the violation (traditional-hypocrite condition), or (b) condemned the violation but explicitly negated any signaling value of the condemnation (honest-hypocrite condition).
 
@@ -69,6 +69,8 @@ To test the authors' prediction, we will conduct a pairwise comparison investiga
 
 In order to confirm that the honest hypocrite manipulation fully eliminates disapproval of hypocrisy, pairwise comparisons should reveal that traditional hypocrites are evaluated more negatively than honest hypocrites. 
 
+
+
 Following the original article criteria, we will exclude from the analysis participants who have identical IP addresses and those who do not complete the survey. 
 
 ##Results
@@ -89,16 +91,18 @@ head(B_data)
 
 ###Preparing data for analysis
 B_data <- B_data %>% 
-  gather(Condition, Eval, starts_with("Traditional"), starts_with("Honest")) %>%
+  gather(Condition, Evaluation, starts_with("Traditional"), starts_with("Honest")) %>%
   separate(Condition, into = c("Condition", "Variable", "Scenario"), sep = "_")
 
 ###Reverse scoring "hypocrite" variable
 
-B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
+#B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
-###Analyzing differences in means
+###Analyzing differences in means for target evaluation
+
+B_data_small <- filter(B_data, Variable != "hypo") #filtering out hypocrite measures 
     
-B_data_small <- B_data %>% 
+B_data_small <- B_data_small %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
 Sub_means <- B_data_small %>%
@@ -126,8 +130,45 @@ plot
 
 The analyses as specified in the analysis plan. 
 ``` {r}
-###Pairwise comparison
+### Key Statistics: Pairwise comparison for target evaluation
 Eval_test <- t.test(sub_mean ~ Condition, data = Sub_means)   
 Eval_test
+```
+
+### Exploratory analysis
+Exploratory analysis of hypocrisy ratings across conditions.
+
+```{r}
+###Extra: Pairwise comparison for hypocrisy ratings
+
+###Analyzing differences in means for hypocrisy ratings
+
+B_data_hypo <- filter(B_data, Variable == "hypo")
+    
+B_data_hypo <- B_data_hypo %>% 
+  select(`Random ID`, Condition, Variable, Evaluation)
+
+Sub_means_hypo <- B_data_hypo %>%
+  group_by(`Random ID`, Condition) %>%
+  summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
+
+Grand_means_hypo <- Sub_means_hypo %>%
+  group_by(Condition) %>%
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
+
+#ciMult <- qt(0.95/2 + .5, 1)
+sd=sd(Grand_means_hypo$grand_mean_evaluation)
+se=sd/sqrt(1)
+#ci= se*ciMult
+
+###Plot
+plot_hypo <- ggplot(Grand_means_hypo, aes(x = Condition, y = grand_mean_evaluation)) + 
+   geom_bar(stat="identity") + ylab("Hypocrisy Ratings") + geom_errorbar(aes(ymin=grand_mean_evaluation-sd, ymax=grand_mean_evaluation+sd), width = .2) + theme_minimal()
+
+plot_hypo
+
+###Pairwise comparison for hypocrisy ratings
+Eval_test_hypo <- t.test(sub_mean ~ Condition, data = Sub_means_hypo)   
+Eval_test_hypo
 
 ``` 
