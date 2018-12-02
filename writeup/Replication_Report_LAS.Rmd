@@ -69,9 +69,11 @@ To test the authors' prediction, we will conduct a pairwise comparison investiga
 
 In order to confirm that the honest hypocrite manipulation fully eliminates disapproval of hypocrisy, pairwise comparisons should reveal that traditional hypocrites are evaluated more negatively than honest hypocrites. 
 
+Following the original article criteria, we will exclude from the analysis participants who have identical IP addresses and those who do not complete the survey.
 
+###Differences from Original Study
 
-Following the original article criteria, we will exclude from the analysis participants who have identical IP addresses and those who do not complete the survey. 
+The only antecipated difference from the original study is that, in this replication, we won't be running the control condition. 
 
 ##Results
 
@@ -83,11 +85,20 @@ Data preparation following the analysis plan.
 ###Import data and Load Relevant Libraries and Functions
 library(tidyverse)
 library(ggplot2)
+library(psych)
 B_data <- read_csv("PilotB_data.csv")
 head(B_data)
+```
+
 
 #### Data exclusion / filtering
+```{r}
 #Delete subjects who have identical IP adresses or who have not completed the survey
+```
+
+###Data Analysis
+
+```{r}
 
 ###Preparing data for analysis
 B_data <- B_data %>% 
@@ -95,17 +106,16 @@ B_data <- B_data %>%
   separate(Condition, into = c("Condition", "Variable", "Scenario"), sep = "_")
 
 ###Reverse scoring "hypocrite" variable
-
 #B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
 ###Analyzing differences in means for target evaluation
 
 B_data_small <- filter(B_data, Variable != "hypo") #filtering out hypocrite measures 
     
-B_data_small <- B_data_small %>% 
+B_data_condition <- B_data_small %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
-Sub_means <- B_data_small %>%
+Sub_means <- B_data_condition %>%
   group_by(`Random ID`, Condition) %>%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
@@ -113,18 +123,20 @@ Grand_means <- Sub_means %>%
   group_by(Condition) %>%
   summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
 
-#ciMult <- qt(0.95/2 + .5, 1)
+ciMult <- qt(0.95/2 + .5, 1)
 sd=sd(Grand_means$grand_mean_evaluation)
-se=sd/sqrt(1)
-#ci= se*ciMult
+se=sd/sqrt(length(Sub_means$`Random ID`))
+ci= se*ciMult
 
 plot <- ggplot(Grand_means, aes(x = Condition, y = grand_mean_evaluation)) + 
-   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-sd, ymax=grand_mean_evaluation+sd), width = .2) + theme_minimal()
+   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
 
 plot
 
-
 ```
+
+Original plot for comparison:
+![Image](C:/Users/luiza/Psych 251/Project PSYCH 251/Jordanetalresults.PNG) 
 
 ### Confirmatory analysis
 
@@ -136,7 +148,7 @@ Eval_test
 ```
 
 ### Exploratory analysis
-Exploratory analysis of hypocrisy ratings across conditions.
+Exploratory analysis. Aggregating by scenario and examining hypocrisy ratings across conditions.
 
 ```{r}
 ###Extra: Pairwise comparison for hypocrisy ratings
@@ -156,14 +168,14 @@ Grand_means_hypo <- Sub_means_hypo %>%
   group_by(Condition) %>%
   summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
 
-#ciMult <- qt(0.95/2 + .5, 1)
+ciMult <- qt(0.95/2 + .5, 1)
 sd=sd(Grand_means_hypo$grand_mean_evaluation)
-se=sd/sqrt(1)
-#ci= se*ciMult
+se=sd/sqrt(length(Sub_means_hypo$`Random ID`))
+ci= se*ciMult
 
 ###Plot
 plot_hypo <- ggplot(Grand_means_hypo, aes(x = Condition, y = grand_mean_evaluation)) + 
-   geom_bar(stat="identity") + ylab("Hypocrisy Ratings") + geom_errorbar(aes(ymin=grand_mean_evaluation-sd, ymax=grand_mean_evaluation+sd), width = .2) + theme_minimal()
+   geom_bar(stat="identity") + ylab("Hypocrisy Ratings") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
 
 plot_hypo
 
@@ -171,4 +183,47 @@ plot_hypo
 Eval_test_hypo <- t.test(sub_mean ~ Condition, data = Sub_means_hypo)   
 Eval_test_hypo
 
+###Aggreating by scenario
+    
+B_data_scenario <- B_data_small %>% 
+  select(`Random ID`, Condition, Scenario, Variable, Evaluation)
+
+Sub_means_scenario <- B_data_scenario %>%
+  group_by(`Random ID`, Condition, Scenario) %>%
+  summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
+
+Grand_means_scenario <- Sub_means_scenario %>%
+  group_by(Scenario) %>%
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
+
+ciMult <- qt(0.95/2 + .5, 1)
+sd=sd(Grand_means_scenario$grand_mean_evaluation)
+se=sd/sqrt(length(Sub_means_scenario$`Random ID`))
+ci= se*ciMult
+
+plot_scenario <- ggplot(Grand_means_scenario, aes(x = Scenario, y = grand_mean_evaluation)) + 
+   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
+
+plot_scenario
+
 ``` 
+
+### Methods Addendum (Post Data Collection)
+
+You can comment this section out prior to final report with data collection.
+
+#### Actual Sample
+  Sample size, demographics, data exclusions based on rules spelled out in analysis plan
+
+#### Differences from pre-data collection methods plan
+  Any differences from what was described as the original plan, or “none”.
+
+## Discussion
+
+### Summary of Replication Attempt
+
+Open the discussion section with a paragraph summarizing the primary result from the confirmatory analysis and the assessment of whether it replicated, partially replicated, or failed to replicate the original result.  
+
+### Commentary
+
+Add open-ended commentary (if any) reflecting (a) insights from follow-up exploratory analysis, (b) assessment of the meaning of the replication (or not) - e.g., for a failure to replicate, are the differences between original and present study ones that definitely, plausibly, or are unlikely to have been moderators of the result, and (c) discussion of any objections or challenges raised by the current and original authors about the replication attempt.  None of these need to be long.
