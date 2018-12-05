@@ -86,52 +86,92 @@ Data preparation following the analysis plan.
 library(tidyverse)
 library(ggplot2)
 library(psych)
-B_data <- read_csv("PilotB_data.csv")
-head(B_data)
+library(effsize) 
+library(corrr)
+library(reshape2)
+library(lme4)
+Final_data <- read_csv("Final_data.csv")
+head(Final_data)
+
+sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(sum(!is.na((x))))}
+ci <- function(x) {sem(x) * 1.96} 
 ```
 
 
 #### Data exclusion / filtering
 ```{r}
-#Delete subjects who have identical IP adresses or who have not completed the survey
+##Delete subjects who have identical IP adresses or who have not completed the survey
+#All subjects in this study had unique IP adresses and completed the survey
 ```
 
 ###Data Analysis
 
 ```{r}
-
 ###Preparing data for analysis
-B_data <- B_data %>% 
+Final_data <- Final_data %>% 
   gather(Condition, Evaluation, starts_with("Traditional"), starts_with("Honest")) %>%
   separate(Condition, into = c("Condition", "Variable", "Scenario"), sep = "_")
+
+###Demographics
+
+F_data_g <- Final_data %>%
+ group_by(Gender) %>%
+ summarise(gender_count=n()/40)
+
+F_data_age <- Final_data %>%
+ group_by(Age) %>%
+ summarise(age_count=n()/40)
+
+F_data_c <- Final_data %>%
+ group_by(Condition) %>%
+ summarise(condition_count=n()/40)
+
+F_data_dem <- F_data_small %>% 
+  select(`Random ID`, Condition, Variable, Evaluation, Age, Gender)
+
+Sub_means_dem <- F_data_dem %>%
+  group_by(Gender, Condition) %>%
+  summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
+
+Grand_means_dem <- Sub_means_dem %>%
+  group_by(Condition) %>%
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE),
+            ci_eval = ci(sub_mean))
 
 ###Reverse scoring "hypocrite" variable
 #B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
 ###Analyzing differences in means for target evaluation
 
-B_data_small <- filter(B_data, Variable != "hypo") #filtering out hypocrite measures 
+F_data_small <- filter(Final_data, Variable != "hypo") #filtering out hypocrite measures 
     
-B_data_condition <- B_data_small %>% 
+F_data_condition <- F_data_small %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
-Sub_means <- B_data_condition %>%
+Sub_means <- F_data_condition %>%
   group_by(`Random ID`, Condition) %>%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
 Grand_means <- Sub_means %>%
   group_by(Condition) %>%
-  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE),
+            ci_eval = ci(sub_mean),
+            sd=sd(sub_mean,  na.rm = TRUE))
 
-ciMult <- qt(0.95/2 + .5, 1)
-sd=sd(Grand_means$grand_mean_evaluation)
-se=sd/sqrt(length(Sub_means$`Random ID`))
-ci= se*ciMult
+sem_eval = sem(Sub_means$sub_mean)
+
+
 
 plot <- ggplot(Grand_means, aes(x = Condition, y = grand_mean_evaluation)) + 
-   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
-
+  ggtitle("Positive Evaluation of Targets by Condition") + 
+  geom_bar(stat="identity") + ylab("Evaluation of Targets") + 
+  geom_errorbar(aes(ymin=grand_mean_evaluation-ci_eval, ymax=grand_mean_evaluation+ci_eval), width = .2) + 
+  scale_x_discrete(limit = c("Traditional", "Honest")) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 plot
+
+ggsave("Replication_Results.pdf")
 
 ```
 
@@ -155,27 +195,30 @@ Exploratory analysis. Aggregating by scenario and examining hypocrisy ratings ac
 
 ###Analyzing differences in means for hypocrisy ratings
 
-B_data_hypo <- filter(B_data, Variable == "hypo")
+F_data_hypo <- filter(Final_data, Variable == "hypo")
     
-B_data_hypo <- B_data_hypo %>% 
+F_data_hypo <- F_data_hypo %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
 
-Sub_means_hypo <- B_data_hypo %>%
+Sub_means_hypo <- F_data_hypo %>%
   group_by(`Random ID`, Condition) %>%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
 Grand_means_hypo <- Sub_means_hypo %>%
   group_by(Condition) %>%
-  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE),
+            ci_hypo = ci(sub_mean),
+            sd=sd(sub_mean,  na.rm = TRUE))
 
-ciMult <- qt(0.95/2 + .5, 1)
-sd=sd(Grand_means_hypo$grand_mean_evaluation)
-se=sd/sqrt(length(Sub_means_hypo$`Random ID`))
-ci= se*ciMult
 
 ###Plot
 plot_hypo <- ggplot(Grand_means_hypo, aes(x = Condition, y = grand_mean_evaluation)) + 
-   geom_bar(stat="identity") + ylab("Hypocrisy Ratings") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
+   geom_bar(stat="identity") + 
+  ggtitle("Hypocrisy Ratings by Condition") +
+  ylab("Hypocrisy Ratings") + 
+  geom_errorbar(aes(ymin=grand_mean_evaluation-ci_hypo, ymax=grand_mean_evaluation+ci_hypo), width = .2) + 
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 
 plot_hypo
 
@@ -185,45 +228,88 @@ Eval_test_hypo
 
 ###Aggreating by scenario
     
-B_data_scenario <- B_data_small %>% 
+F_data_scenario <- F_data_small %>% 
   select(`Random ID`, Condition, Scenario, Variable, Evaluation)
 
-Sub_means_scenario <- B_data_scenario %>%
+Sub_means_scenario <- F_data_scenario %>%
   group_by(`Random ID`, Condition, Scenario) %>%
   summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
 
 Grand_means_scenario <- Sub_means_scenario %>%
   group_by(Scenario) %>%
-  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE))
-
-ciMult <- qt(0.95/2 + .5, 1)
-sd=sd(Grand_means_scenario$grand_mean_evaluation)
-se=sd/sqrt(length(Sub_means_scenario$`Random ID`))
-ci= se*ciMult
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE),
+           ci_sce = ci(sub_mean))
 
 plot_scenario <- ggplot(Grand_means_scenario, aes(x = Scenario, y = grand_mean_evaluation)) + 
-   geom_bar(stat="identity") + ylab("Evaluation of Targets") + geom_errorbar(aes(ymin=grand_mean_evaluation-ci, ymax=grand_mean_evaluation+ci), width = .2) + theme_minimal()
+  ggtitle("Evaluation of Targets by Scenario") +
+  geom_bar(stat="identity") + 
+  ylab("Evaluation of Targets") + 
+  geom_errorbar(aes(ymin=grand_mean_evaluation-ci_sce, ymax=grand_mean_evaluation+ci_sce), width = .2) +
+  scale_y_continuous(expand = c(0,0)) +
+  theme_bw() + 
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 
 plot_scenario
 
+#mixed.lmer <- lmer(Evaluation ~ Condition + (1|Variable), data = F_data_scenario)
+#summary(mixed.lmer)
+#plot(mixed.lmer)
+#qqnorm(resid(mixed.lmer))
+#qqline(resid(mixed.lmer))
+#sce <- F_data_scenario %>% 
+  #group_by_at(vars(-Evaluation)) %>%  # group by everything other than the value column. 
+  #mutate(row_id=1:n()) %>% ungroup() %>%  # build group index
+  #spread(key=Scenario, value=Evaluation) %>%    # spread
+  #select(-row_id) %>%  # drop the index 
+  #select(-c(`Random ID`, Condition, Variable))
+
+#psych::alpha(x = sce)$total$std.alpha
+
+### Coherence of participants' responses across variables
+F_data_variable <- F_data_small %>% 
+  select(`Random ID`, Condition, Variable, Evaluation)
+
+Sub_means_variable <- F_data_variable %>%
+  group_by(`Random ID`, Condition, Variable) %>%
+  summarise(sub_mean = mean(Evaluation, na.rm = TRUE))
+
+Grand_means_variable <- Sub_means_variable %>%
+  group_by(Variable) %>%
+  summarise(grand_mean_evaluation = mean(sub_mean, na.rm=TRUE),
+            ci_variable = ci(sub_mean))
+
+var <- F_data_variable %>% 
+  group_by_at(vars(-Evaluation)) %>%  # group by everything other than the value column. 
+  mutate(row_id=1:n()) %>% ungroup() %>%  # build group index
+  spread(key=Variable, value=Evaluation) %>%    # spread
+  select(-row_id) %>%  # drop the index 
+  select(-`Random ID`) %>%
+   select(-Condition)
+
+inter_item <- var %>% correlate()
+
+psych::alpha(x = var)$total$std.alpha
+
 ``` 
 
-### Methods Addendum (Post Data Collection)
-
-You can comment this section out prior to final report with data collection.
-
 #### Actual Sample
-  Sample size, demographics, data exclusions based on rules spelled out in analysis plan
+  As anticipated, we collected data from 300 Mturkers (54% male). All participants had unique IP addresses and completed the survey, therefore there were no exclusions. 
 
 #### Differences from pre-data collection methods plan
-  Any differences from what was described as the original plan, or “none”.
+  No differences from what was described as the original plan. 
 
 ## Discussion
 
 ### Summary of Replication Attempt
 
-Open the discussion section with a paragraph summarizing the primary result from the confirmatory analysis and the assessment of whether it replicated, partially replicated, or failed to replicate the original result.  
+This project's results show a successful replication of Study 4 of Jordan 2017. Similarly to the original study, we found high interitem reliability among the four evaluation variables (?? = .94), and we averaged these ratings to create a composite scale. 
+
+The original paper's primary statistical analysis was replicated as traditional hypocrites (M = 35.45, SD = 19.04) were judged more negatively than honest hypocrites (M = 51.97, SD = 17.23), mean difference = 16.52, 95% CI = [12.39, 20.65], t(296) = 7.88, p < .001, d = 0.91. 
+
+Moreover, exploratory pairwise comparisons showed that, just like the original study, traditional hypocrites (M
+= 79.74, SD = 18.95) were seen as more hypocritical than honest hypocrites (M = 62.39, SD =20.31), (t(292) = -7.62, p < .001, d = .88).
 
 ### Commentary
 
-Add open-ended commentary (if any) reflecting (a) insights from follow-up exploratory analysis, (b) assessment of the meaning of the replication (or not) - e.g., for a failure to replicate, are the differences between original and present study ones that definitely, plausibly, or are unlikely to have been moderators of the result, and (c) discussion of any objections or challenges raised by the current and original authors about the replication attempt.  None of these need to be long.
+Overall, Jordan 2017 Study 4's results were successfully replicated. All results were faithful to the ones reported in the original paper.
+
