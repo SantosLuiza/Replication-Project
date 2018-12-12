@@ -19,7 +19,10 @@ As a graduate student in Psychology, I am interested in exploring the processes 
 As the authors made all data and materials publicly available via the Open Science Framework, potential replication difficulties have been significantly decreased.
 
 Link to repository: https://github.com/SantosLuiza/Replication-Project
+
 Link to original paper: https://github.com/SantosLuiza/Replication-Project/blob/master/original_paper/jordan2016.pdf
+
+Link to preregistration: https://osf.io/e46j7/
 
 ##Methods
 
@@ -43,23 +46,23 @@ After reading the vignettes, participants will be asked to evaluate the target.
 
 We will follow the original paper's procedure precisely. Below is a detailed description of the study design as outlined by original authors.
 
-"Each vignette described a conversation between two characters: a target (whom subjects would later evaluate) and a friend (whom subjects would not evaluate). In all conditions, this conversation began with the target and the friend discussing a mutual acquaintance. In this discussion, the friend mentioned that the mutual acquaintance often engaged in a particular moral transgression."
+>"Each vignette described a conversation between two characters: a target (whom subjects would later evaluate) and a friend (whom subjects would not evaluate). In all conditions, this conversation began with the target and the friend discussing a mutual acquaintance. In this discussion, the friend mentioned that the mutual acquaintance often engaged in a particular moral transgression."
 
-"In the traditional-hypocrite condition, the target responded to the friend by condemning the transgression. In the honest-hypocrite condition, the target responded to the friend by stating that he or she believed the behavior in question to be morally wrong but sometimes behaved that way anyway. (...) Shortly after this conversation ended, in all conditions, the target went on to commit the relevant violation.
+>"In the traditional-hypocrite condition, the target responded to the friend by condemning the transgression. In the honest-hypocrite condition, the target responded to the friend by stating that he or she believed the behavior in question to be morally wrong but sometimes behaved that way anyway. (...) Shortly after this conversation ended, in all conditions, the target went on to commit the relevant violation.
 
-For example, here is the full text for a scenario about downloading music illegally. In this scenario, Becky is the target character, and Amanda is the friend. In all conditions, the vignette began as follows:
+>For example, here is the full text for a scenario about downloading music illegally. In this scenario, Becky is the target character, and Amanda is the friend. In all conditions, the vignette began as follows:
 
     Becky and her friend Amanda are discussing a mutual acquaintance. Amanda mentions that the acquaintance often downloads music illegally from the Internet.
 
-In the traditional-hypocrite condition, the scenario continued with
+>In the traditional-hypocrite condition, the scenario continued with
 
     Becky says that she thinks it is morally wrong to download music illegally from the Internet. Shortly after their conversation, Becky goes online, and downloads music illegally.
 
-In the honest-hypocrite condition, the passage instead continued with
+>In the honest-hypocrite condition, the passage instead continued with
 
     Becky says that she thinks it is morally wrong to download music illegally from the Internet, but that she sometimes does it anyway. Shortly after their conversation, Becky goes online, and downloads music illegally.
 
-After reading each vignette, subjects evaluated the target. We asked subjects to rate how good a person the target was, how much they liked the target, how honest they thought the target was, and how trustworthy they thought the target was. These five dependent measures were presented in random order for each vignette. They responded to each item on a sliding scale, with anchors reading not at all [trait] to very [trait] (e.g., not at all trustworthy to very trustworthy). The sliding scales did not have any numerical labels, but responses were translated to scores ranging from 0 (not at all) to 100 (very)."
+>After reading each vignette, subjects evaluated the target. We asked subjects to rate how good a person the target was, how much they liked the target, how honest they thought the target was, and how trustworthy they thought the target was. These five dependent measures were presented in random order for each vignette. They responded to each item on a sliding scale, with anchors reading not at all [trait] to very [trait] (e.g., not at all trustworthy to very trustworthy). The sliding scales did not have any numerical labels, but responses were translated to scores ranging from 0 (not at all) to 100 (very)."
 
 Link to paradigm: https://stanforduniversity.qualtrics.com/jfe/form/SV_5nJWFtwbmrNq3jL
 
@@ -73,7 +76,7 @@ Following the original article criteria, we will exclude from the analysis parti
 
 ###Differences from Original Study
 
-The only antecipated difference from the original study is that, in this replication, we won't be running the control condition. 
+The only anticipated difference from the original study is that, in this replication, we won't be running the control condition. 
 
 ##Results
 
@@ -90,6 +93,8 @@ library(effsize)
 library(corrr)
 library(reshape2)
 library(lme4)
+library(pwr)
+
 Final_data <- read_csv("Final_data.csv")
 head(Final_data)
 
@@ -111,6 +116,8 @@ ci <- function(x) {sem(x) * 1.96}
 Final_data <- Final_data %>% 
   gather(Condition, Evaluation, starts_with("Traditional"), starts_with("Honest")) %>%
   separate(Condition, into = c("Condition", "Variable", "Scenario"), sep = "_")
+
+F_data_small <- filter(Final_data, Variable != "hypo") #filtering out hypocrite measures
 
 ###Demographics
 
@@ -142,8 +149,6 @@ Grand_means_dem <- Sub_means_dem %>%
 #B_data <- mutate(B_data, Evaluation = ifelse(B_data$Variable == "hypo", 100 - B_data$Eval, B_data$Eval))
 
 ###Analyzing differences in means for target evaluation
-
-F_data_small <- filter(Final_data, Variable != "hypo") #filtering out hypocrite measures 
     
 F_data_condition <- F_data_small %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
@@ -161,7 +166,6 @@ Grand_means <- Sub_means %>%
 sem_eval = sem(Sub_means$sub_mean)
 
 
-
 plot <- ggplot(Grand_means, aes(x = Condition, y = grand_mean_evaluation)) + 
   ggtitle("Positive Evaluation of Targets by Condition") + 
   geom_bar(stat="identity") + ylab("Evaluation of Targets") + 
@@ -169,9 +173,9 @@ plot <- ggplot(Grand_means, aes(x = Condition, y = grand_mean_evaluation)) +
   scale_x_discrete(limit = c("Traditional", "Honest")) +
   scale_y_continuous(expand = c(0,0)) +
   theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
+
 plot
 
-ggsave("Replication_Results.pdf")
 
 ```
 
@@ -185,6 +189,7 @@ The analyses as specified in the analysis plan.
 ### Key Statistics: Pairwise comparison for target evaluation
 Eval_test <- t.test(sub_mean ~ Condition, data = Sub_means)   
 Eval_test
+
 ```
 
 ### Exploratory analysis
@@ -218,6 +223,7 @@ plot_hypo <- ggplot(Grand_means_hypo, aes(x = Condition, y = grand_mean_evaluati
   ylab("Hypocrisy Ratings") + 
   geom_errorbar(aes(ymin=grand_mean_evaluation-ci_hypo, ymax=grand_mean_evaluation+ci_hypo), width = .2) + 
   scale_y_continuous(expand = c(0,0)) +
+  scale_x_discrete(limit = c("Traditional", "Honest")) +
   theme_bw() + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))
 
 plot_hypo
@@ -251,20 +257,6 @@ plot_scenario <- ggplot(Grand_means_scenario, aes(x = Scenario, y = grand_mean_e
 
 plot_scenario
 
-#mixed.lmer <- lmer(Evaluation ~ Condition + (1|Variable), data = F_data_scenario)
-#summary(mixed.lmer)
-#plot(mixed.lmer)
-#qqnorm(resid(mixed.lmer))
-#qqline(resid(mixed.lmer))
-#sce <- F_data_scenario %>% 
-  #group_by_at(vars(-Evaluation)) %>%  # group by everything other than the value column. 
-  #mutate(row_id=1:n()) %>% ungroup() %>%  # build group index
-  #spread(key=Scenario, value=Evaluation) %>%    # spread
-  #select(-row_id) %>%  # drop the index 
-  #select(-c(`Random ID`, Condition, Variable))
-
-#psych::alpha(x = sce)$total$std.alpha
-
 ### Coherence of participants' responses across variables
 F_data_variable <- F_data_small %>% 
   select(`Random ID`, Condition, Variable, Evaluation)
@@ -295,14 +287,11 @@ psych::alpha(x = var)$total$std.alpha
 #### Actual Sample
   As anticipated, we collected data from 300 Mturkers (54% male). All participants had unique IP addresses and completed the survey, therefore there were no exclusions. 
 
-#### Differences from pre-data collection methods plan
-  No differences from what was described as the original plan. 
-
 ## Discussion
 
 ### Summary of Replication Attempt
 
-This project's results show a successful replication of Study 4 of Jordan 2017. Similarly to the original study, we found high interitem reliability among the four evaluation variables (?? = .94), and we averaged these ratings to create a composite scale. 
+This project's results show a successful replication of Study 4 of Jordan 2017. Similarly to the original study, we found high interitem reliability among the four evaluation variables (*a* = .94), and we averaged these ratings to create a composite scale. 
 
 The original paper's primary statistical analysis was replicated as traditional hypocrites (M = 35.45, SD = 19.04) were judged more negatively than honest hypocrites (M = 51.97, SD = 17.23), mean difference = 16.52, 95% CI = [12.39, 20.65], t(296) = 7.88, p < .001, d = 0.91. 
 
